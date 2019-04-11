@@ -9,32 +9,31 @@
         <h1 class="title">{{headerTitle}}</h1>
       </div>
     </div>
-    <scroll class="list"
-    @scroll="scroll"
-    :probe-type="probeType"
-    :listen-scroll="listenScroll"
+    <scroll class="list" 
+    @scroll="scroll" 
+    :probe-type="probeType" 
+    :listen-scroll="listenScroll" 
     ref="list">
       <div class="music-list-wrapper">
         <div class="bg-image" :style="bgStyle" ref="bgImage">
           <div class="filter"></div>
           <div class="text">
             <h2 class="list-title">
-              <!-- <p class="music">云音乐</p> -->
               {{title}}
             </h2>
             <p class="update">{{updateTime}}</p>
           </div>
         </div>
         <div class="song-list-wrapper">
-          <div class="sequence-play" v-show="listDetail.length" @click="sequence">
+          <div class="sequence-play" v-show="songs.length" @click="playSongList">
             <i class="iconfont icon-bofangicon"></i>
             <span class="text">播放全部</span>
-            <span class="count">(共{{listDetail.length}}首)</span>
+            <span class="count">(共{{songs.length}}首)</span>
           </div>
-          <song-list @select="selectItem" :songs="listDetail"></song-list>
+          <song-list @select="selectSong" :songs="songs"></song-list>
         </div>
       </div>
-      <div v-show="!listDetail.length" class="loading-content">
+      <div v-show="!songs.length" class="loading-content">
         <loading></loading>
       </div>
     </scroll>
@@ -46,9 +45,9 @@
 import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
 import SongList from 'base/song-list/song-list'
-import {mapGetters, mapActions} from 'vuex'
 import {playlistMixin} from 'common/js/mixin'
 import {createSong} from 'common/js/song'
+import {mapGetters, mapActions} from 'vuex'
 
 const RESERVED_HEIGHT = 44
 
@@ -56,19 +55,16 @@ export default {
   mixins: [playlistMixin],
   data () {
     return {
-      listDetail: [],
+      songs: [],
       scrollY: 0,
       node: null,
       headerTitle: ''
     }
   },
   created () {
-    if (!this.topList.id) {
-      this.$router.push('/rank')
-    }
-    this._normalizeSongs(this.topList.tracks)
-    this.probeType = 3
-    this.listenScroll = true
+    this.getSongSheetDetail();
+    this.probeType = 3;
+    this.listenScroll = true;
   },
   mounted () {
     this.imageHeight = this.$refs.bgImage.clientHeight
@@ -76,22 +72,22 @@ export default {
   },
   computed: {
     headerTitleTouchDown () {
-      return this.topList.name
+      return this.songSheet.name
     },
     bgStyle () {
-      return `background-image: url(${this.topList.coverImgUrl})`
+      return `background-image: url(${this.songSheet.bgImgUrl})`
     },
     title () {
       return this.headerTitleTouchDown
     },
     updateTime () {
-      let time = new Date(this.topList.updateTime)
+      let time = new Date(this.songSheet.updateTime)
       let month = time.getMonth() + 1
       let day = time.getDate()
       return `最近更新:${month}月${day}日`
     },
     ...mapGetters([
-      'topList'
+      'songSheet'
     ])
   },
   methods: {
@@ -100,20 +96,19 @@ export default {
       this.$refs.list.$el.style.bottom = bottom
       this.$refs.list.refresh()
     },
-    _normalizeSongs (list) {
-      if (!this.topList.id) {
-        this.$router.push('/rank')
-        return
-      }
+    getSongSheetDetail(){
+      //this.normalizeSongs(this.songSheet.tracks)
+    },
+    normalizeSongs (list) {
       let ret = []
       list.forEach((item) => {
         ret.push(createSong(item))
       })
-      this.listDetail = ret
+      this.songs = ret
     },
-    selectItem (item, index) {
+    selectSong (item, index) {
       this.selectPlay({
-        list: this.listDetail,
+        list: this.songs,
         index: index
       })
     },
@@ -123,8 +118,8 @@ export default {
     back () {
       this.$router.back()
     },
-    sequence () {
-      let list = this.listDetail
+    playSongList () {
+      let list = this.songs
       this.sequencePlay({
         list: list
       })

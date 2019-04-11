@@ -707,7 +707,7 @@ export default {
     }
     .control {
       flex: 0 0 30px;
-      width: 30px;
+      width: 50px;
       padding: 0 10px;
       .icon-play-mini, .icon-pause-mini, .icon-playlist, .iconfont {
         font-size: 30px;

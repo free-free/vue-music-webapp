@@ -109,7 +109,6 @@ export default {
       this.$router.push({
         path: `/recommend/${item.id}`
       })
-      // console.log(item)
       this.setMuiscList(item)
     },
     _getBanner () {

@@ -63,7 +63,7 @@ export default {
       listDetail: [],
       scrollY: 0,
       node: null,
-      headerTitle: '歌手'
+      headerTitle: ''
     }
   },
   created () {
@@ -146,21 +146,17 @@ export default {
       this.listDetail = this._normalizeSongs(val)
     },
     scrollY (newY) {
-      // let translateY = Math.max(this.minTranslateY, newY)
       const percent = Math.abs(newY / this.imageHeight)
       if (newY < (this.minTranslateY + RESERVED_HEIGHT - 20)) {
         this.headerTitle = this.headerTitleTouchDown
       } else {
-        this.headerTitle = '歌手'
+        this.headerTitle = ''
       }
       if (newY < 0) {
         this.$refs.header.style.background = `rgba(212, 68, 57, ${percent})`
       } else {
         this.$refs.header.style.background = `rgba(212, 68, 57, 0)`
       }
-      // console.log(this.minTranslateY + RESERVED_HEIGHT)
-      // if (translateY )
-      // console.log(translateY)
     }
   },
   components: {
