@@ -17,6 +17,8 @@ const state = {
   currentIndex: -1,
   disc: {},
   topList: {},
+  songSheet: {},
+  uprofile:{},
   searchHistory: loadSearch(),
   playHistory: loadPlay(),
   favoriteList: loadFavorite()

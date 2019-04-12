@@ -38,6 +38,19 @@ const mutations = {
   },
   [types.SET_FAVORITE_LIST] (state, list) {
     state.favoriteList = list
+  },
+  [types.SET_SONG_SHEET] (state, songsheet){
+    state.songSheet = songsheet;
+  },
+  [types.UPDATE_UPROFILE] (state, profile){
+    for(let key in profile){
+      if (key in state.uprofile){
+        state.uprofile[key] = profile[key]
+      }
+    }
+  },
+  [types.SET_UPROFILE] (state, profile){
+    state.uprofile = profile;
   }
 }
 

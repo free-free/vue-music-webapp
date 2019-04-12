@@ -27,6 +27,10 @@ export const playHistory = state => state.playHistory
 
 export const favoriteList = state => state.favoriteList
 
+export const songSheet = state => state.songSheet
+
+export const uprofile = state => state.uprofile
+
 export const currentSong = (state) => {
   return state.playlist[state.currentIndex] || {}
 }
