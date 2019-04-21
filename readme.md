@@ -1,9 +1,10 @@
 
-# Vue 云音乐 WebApp
 
 ## 声明：
 
-该项目是从[caijinyc](https://github.com/caijinyc/vue-music-webapp)的项目copy过来的，并在其基础添加了用户资料管理、用户歌单管理、用户动态管理等功能。具体使用说明请参考[vue-music-webapp](https://github.com/caijinyc/vue-music-webapp)。
+> 该项目是从[caijinyc](https://github.com/caijinyc/vue-music-webapp)的项目copy过来的，并在其基础添加了用户资料管理、用户歌单管理、用户动态管理等功能。具体使用说明请参考[vue-music-webapp](https://github.com/caijinyc/vue-music-webapp)。
+
+# Vue 云音乐 WebApp
 
 :musical_keyboard: 基于 Vue(2.5) + vuex + vue-router + vue-axios +better-scroll + Scss + ES6 等开发一款移动端音乐 WebApp，UI 界面参考了安卓版的网易云音乐、flex 布局适配常见移动端。
 
@@ -62,13 +63,6 @@
 播放器内核、推荐页面、热榜页面、歌手页面、歌单详情、歌手详情、排行榜详情、搜索页面、播放列表、用户中心等等功能。
 
 
-## TODO
-
-1. 优化排行榜加载速度
-2. 优化重复代码
-3. 增加歌曲评论
-4. 增加 MV、电台 功能
-5. emm，更多功能容我再想想哈
 
 ## 感谢
 
