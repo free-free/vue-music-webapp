@@ -1,4 +1,4 @@
-import Vue from 'vue'
+/*import Vue from 'vue'*/
 import Router from 'vue-router'
 // import Singer from 'cpnts/singer/singer'
 // import Recommend from 'cpnts/recommend/recommend'
@@ -16,7 +16,17 @@ const Recommend = (resolve) => {
     resolve(module)
   })
 }
+const Login = (resolve) => {
+  import('cpnts/login/login').then((module)=>{
+    resolve(module)
+  })
+}
 
+const Register = (resolve) =>{
+  import('cpnts/register/register').then((module)=>{
+    resolve(module)
+  })
+}
 const Singer = (resolve) => {
   import('cpnts/singer/singer').then((module) => {
     resolve(module)
@@ -32,6 +42,12 @@ const Rank = (resolve) => {
 const Search = (resolve) => {
   import('cpnts/search/search').then((module) => {
     resolve(module)
+  })
+}
+
+const SongSheet = (resolve) =>{
+  import('cpnts/songsheet/songsheet').then((module) =>{
+    resolve(module);
   })
 }
 
@@ -59,8 +75,33 @@ const User = (resolve) => {
   })
 }
 
+const FeedDetail = (resolve) => {
+  import('cpnts/feed-detail/feed-detail').then((module) => {
+    resolve(module);
+  })
+}
+
+const FeedPost = (resolve) => {
+  import('cpnts/feed-post/feed-post').then((module) =>{
+    resolve(module);
+  })
+}
+
+const ProfileEdit = (resolve) => {
+  import('cpnts/profile-edit/profile-edit').then((module) =>{
+    resolve(module);
+  })
+}
+
+
 export default new Router({
   routes: [
+    /*
+    {
+      path: '/',
+      redirect: '/login'
+    },
+   */
     {
       // 默认跳转到 recommend
       path: '/',
@@ -85,6 +126,10 @@ export default new Router({
           component: SingerDetail
         }
       ]
+    },
+    {
+      path: '/songsheet/:id',
+      component: SongSheet,
     },
     {
       path: '/rank',
@@ -112,7 +157,27 @@ export default new Router({
     },
     {
       path: '/user',
-      component: User
+      component: User,
+    },
+    {
+      path: '/user/profile',
+      component: ProfileEdit
+    },
+    {
+      path:'/login',
+      component: Login
+    },
+    {
+      path:'/register',
+      component: Register
+    },
+    {
+      path:'/feed',
+      component: FeedDetail
+    },
+    {
+      path: '/feed/post',
+      component: FeedPost
     }
   ]
 })
