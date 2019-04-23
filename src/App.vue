@@ -15,6 +15,7 @@ import Tab from 'cpnts/tab/tab'
 import Player from 'cpnts/player/player'
 
 export default {
+  name:"app",
   // 这里的代码除了 components，其他的都是用来解决 移动端需不能自动播放的问题
   // 方法很鬼畜，看看就好，找到好的解决办法我会改的
   data () {

@@ -5,9 +5,9 @@
       <i class="fa fa-angle-left"></i>
     </div>
     <div class='profile'>
-      <div class="bg-image"><img :src="profile.bg_url"/></div>
-      <div class="avatar"><img :src="profile.avatar_url"/></div>
-      <div class="edit-btn">
+      <div class="bg-image"><img :src="profile.bgImgUrl"/></div>
+      <div class="avatar"><img :src="profile.avatarUrl"/></div>
+      <div class="edit-btn" @click="onProfileEditBtnClick">
         <i class="fa fa-pencil" aria-hidden="true"></i>
         <span class="text">编辑</span>
       </div>
@@ -17,7 +17,7 @@
           <i style="color:#FFD1E4;" class="fa fa-venus" aria-hidden="true"></i>女</div>
         <div class="gender" v-else>
           <i style="color:#26A6E4;" class="fa fa-mars" aria-hidden="true"></i> 男</div>
-        <div class="follower-cnt">Follower&nbsp;&nbsp;{{profile.follower_cnt}}</div>
+        <div class="follower-cnt">Follower&nbsp;&nbsp;{{profile.followerCnt}}</div>
       </div>
     </div>
     <div class="switches-wrapper">
@@ -37,7 +37,7 @@
           <feed-list :data='feeds' ref="feedList" @retweet="onRetweet" @praise="onPraise" @clickview="onClickFeedView"></feed-list>
         </div>
         <div class="post-feed" >
-          <el-button type="danger" icon="el-icon-plus"  class="post-feed-btn" circle></el-button>
+          <el-button type="danger" icon="el-icon-plus"  class="post-feed-btn" @click="onPostFeedBtnclick" circle></el-button>
         </div>
       </scroll>
      
@@ -71,13 +71,6 @@ export default {
         {name: '动态'},
         {name: '我的'}
       ],
-      profile:{
-        avatar_url:"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
-        bg_url:"http://img1.imgtn.bdimg.com/it/u=3221312703,524229742&fm=26&gp=0.jpg",
-        nickname:"infinite.ft",
-        gender: '0',
-        follower_cnt: 80
-      },
       songSheets:[],
       feeds:[]
     }
@@ -106,18 +99,31 @@ export default {
         return '你还没有听过歌呀~'
       }
     },
-    ...mapGetters([
-      'favoriteList',
-      'playHistory',
-      'singer'
-    ])
+    ...mapGetters({
+      'favoriteList':'favoriteList',
+      'playHistory':'playHistory',
+      'singer':'singer',
+      'profile':'uprofile'
+    })
   },
   created(){
-    //this.feeds = this.formalizeFeedData();
+    if(!('nickname' in this.profile)){
+      let profile = this.getProfile();
+      this.setProfile(profile);
+    }
     this.getSongSheets();
-
   },
   methods: {
+    getProfile(){
+      let profile =  {
+        avatarUrl: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
+        bgImgUrl: "http://img1.imgtn.bdimg.com/it/u=3221312703,524229742&fm=26&gp=0.jpg",
+        nickname: "infinite.ft",
+        gender: "0",
+        followerCnt:80
+      }
+      return profile
+    },
     back () {
       this.$router.back()
     },
@@ -294,13 +300,24 @@ export default {
         }
       });
     },
+    onPostFeedBtnclick(){
+      this.$router.push({
+        path:'/feed/post'
+      });
+    },
+    onProfileEditBtnClick(){
+      this.$router.push({
+        path:'/user/profile'
+      });
+    },
     ...mapActions([
       'insertSong',
       'sequencePlay',
     ]),
     ...mapMutations({
       setSinger: 'SET_SINGER',
-      setSongSheet: 'SET_SONG_SHEET'
+      setSongSheet: 'SET_SONG_SHEET',
+      setProfile: 'SET_UPROFILE'
     })
   },
   components: {
@@ -373,7 +390,7 @@ export default {
     }
     .nickname{
       color: white;
-      width:80px;
+      display:inline-block;
       height:20px;
       font-size:18px;
       line-height:20px;

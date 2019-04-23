@@ -468,7 +468,6 @@ export default {
         border:none;
         outline:none;
         line-height:20px;
-        overflow-y:hidden;
       }
     }
     .comment-btn{

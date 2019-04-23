@@ -1,9 +1,5 @@
 <template>
-  <scroll
-  class="listview"
-  ref="listview"
-  :listenScroll="listenScroll"
-  @scroll="scroll"
+  <scroll class="listview" ref="listview" :listenScroll="listenScroll" @scroll="scroll" 
   :probeType="probeType"
   >
     <ul>

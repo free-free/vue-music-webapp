@@ -35,12 +35,14 @@ export default {
   .switches {
     display: flex;
     align-items: center;
-    width: 240px;
+    width: 320px;
     margin: 0 auto;
-    // border-radius: 5px;
+    /*border-radius: 5px;*/
     .switch-item {
       flex: 1;
       padding: 8px;
+      padding-left: 4px;
+      padding-right: 4px;
       margin: 0 20px;
       text-align: center;
       font-size: $font-size-medium;
@@ -48,7 +50,7 @@ export default {
       border-bottom: 2px solid $color-theme;
       &.active {
         border-bottom: 2px solid $color-text-l;
-        // background: $color-highlight-background;
+        /*background: $color-highlight-background;*/
         color: #fff;
       }
     }

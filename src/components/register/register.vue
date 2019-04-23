@@ -86,11 +86,21 @@
             data['email'] = _this.registerData['email'];
             Auth.register(data, function(res){
               _this.registering = false;
-              switch(res.errcode){
-                case 40005:
+              switch(res.code){
+                case 3000:
+                  localStorage.setItem('username', _this.
+                      registerData['username'])
+                  localStorage.setItem('email', _this.registerData['email']);
+                  localStorage.setItem('password', _this.registerData['password']);
+                  for (var key in res.user){
+                    sessionStorage.setItem(key, res.user[key]);
+                  }
+                  _this.$router.push({ path: '/' });
+                break;
+                case 3007:
                   _this.$message({
-                    message: "该邮箱已被注册过!",
-                    type: 'error'
+                    message:  res.message,
+                    type: 'info'
                   });
                 break;
                 case 50001:
@@ -106,9 +116,8 @@
                   });
                 break;
                 default:
-                  if (!res.errcode) {
-                    localStorage.setItem('account', _this.registerData['email']);
-                    localStorage.setItem('password', _this.registerData['password']);
+                  if (res.code == 3000) {
+                    /*
                     _this.$message({
                       message: "激活邮件已发送到你的邮箱，请去激活账号",
                       type: 'info',
@@ -121,6 +130,7 @@
                         window.location.reload();
                       }
                     });
+                    */
                   }
                 break;
               }    

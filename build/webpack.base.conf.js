@@ -24,6 +24,10 @@ module.exports = {
   entry: {
     app: './src/main.js'
   },
+  externals:{
+    'vue':"Vue",
+    'element-ui':'ElementUI'
+  },
   output: {
     path: config.build.assetsRoot,
     filename: '[name].js',
@@ -43,7 +47,7 @@ module.exports = {
   },
   module: {
     rules: [
-      ...(config.dev.useEslint ? [createLintingRule()] : []),
+      //...(config.dev.useEslint ? [createLintingRule()] : []),
       {
         test: /\.vue$/,
         loader: 'vue-loader',
