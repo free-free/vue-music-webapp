@@ -5,8 +5,8 @@
       <div class="container">
           <el-form :model="loginData" :rules="loginFormRules" ref="loginForm" label-position="left" label-width="0px" class="ruleForm login-form" >
             <h3 class="title">登录Cloud Music</h3>
-            <el-form-item prop="account" class="form-item">
-              <el-input type="text" v-model="loginData.account"  auto-complete="on" class="form-input" placeholder="用户名/邮箱" @keyup.enter.native="onLoginBtnClick" prefix-icon="fa fa-user-circle-o" size="medium"></el-input>
+            <el-form-item prop="email" class="form-item">
+              <el-input type="text" v-model="loginData.email"  auto-complete="on" class="form-input" placeholder="邮箱" @keyup.enter.native="onLoginBtnClick" prefix-icon="fa fa-user-circle-o" size="medium"></el-input>
             </el-form-item>
             <el-form-item prop="password"  class="form-item">
               <el-input type="password"
@@ -34,12 +34,12 @@
       return {
         logining: false,
         loginData: {
-          account: '',
+          email: '',
           password: ''
         },
         loginFormRules: {
-          account: [
-            { required: true, message: '请输入用户名/邮箱', trigger: 'blur' },
+          email: [
+            { required: true, message: '请输入邮箱', trigger: 'blur' },
           ],
           password: [
             { required: true, message: '请输入密码', trigger: 'blur' },
@@ -77,47 +77,39 @@
           if (valid) {
             var data = {};
             _this.logining = true;
-            if(_this.checked){
-              localStorage.setItem('account', _this.loginData['account']);
-              localStorage.setItem('password', _this.loginData['password']);
-            }
-            else{
-              localStorage.removeItem('account');
-              localStorage.removeItem('password');
-            }
-            data['account'] = _this.loginData['account'];
+            localStorage.setItem('email', _this.loginData['email']);
+            localStorage.setItem('password', _this.loginData['password']);
+            data['email'] = _this.loginData['email'];
             data['password'] = md5(_this.loginData['password']);
             Auth.login(data, function(res){
               _this.logining = false;
-              switch(res.errcode){
-                case 40001:
+              switch(res.code){
+                case 200:
+                  for (var key in res.user){
+                    sessionStorage.setItem(key, res.user[key]);
+                  }
+                  _this.$router.push({ path: '/' });
+                  break;
                 case 40002:
                   _this.$message({
                     message: "用户名或密码不正确!",
                     type: 'error'
                   });
-                break;
+                  break;
                 case 40003:
                   _this.$message({
                     message: "用户未激活, 请登录邮箱激活!",
                     type: 'error'
                   });  
-                break;
+                  break;
                 case 40004:
                   _this.$message({
                     message: "用户未注册!",
                     type: 'error'
                   });  
-                break;
+                  break;
                 default:
-                if (!res.errcode) {
-                  for (var key in res){
-                    sessionStorage.setItem(key, res[key]);
-                  }
-                  console.log(res);
-                  _this.$router.push({ path: '/' });
-                }
-                break;
+                  break;
               }
               
             });
