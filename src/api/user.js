@@ -1,12 +1,15 @@
 import axios from 'axios'
 import {HOST} from 'common/js/config'
 
-export function getPlaylist() {
-  const url = HOST + `/music/url?id=${id}`
-  return axios.get(url)
+const User = {
+  baseUrl:'',
+  get_profile:function(data, cb){
+    return requester.sendGetReq(this.baseUrl + '/user/profile', data, cb);
+  },
+  update_profile:function(data, cb){
+    return requester.sendPostReq(this.baseUrl + '/user/profile', data, cb);
+  }
 }
 
-export function getFeed() {
-  const url = HOST + `/lyric?id=${id}`
-  return axios.get(url)
-}
+
+export default User;
