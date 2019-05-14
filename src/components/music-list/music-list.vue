@@ -57,12 +57,6 @@ const RESERVED_HEIGHT = 44
 
 export default {
   mixins: [playlistMixin],
-  // props: {
-  //   songs: {
-  //     type: Array,
-  //     default: () => { return [] }
-  //   }
-  // },
   data () {
     return {
       listDetail: [],
@@ -125,8 +119,10 @@ export default {
       }
       getRecommendListDetail(id).then((res) => {
         if (res.status === ERR_OK) {
-          this.listDetail = res.data.result.tracks.map((item) => {
-            return createRecommendListSong(item)
+          this.listDetail = res.data.playlist.tracks.map(item => {
+            if(item){
+              return createRecommendListSong(item)  
+            }
           })
         } else {
           console.error('getRecommendListDetail 获取失败！')
@@ -146,7 +142,6 @@ export default {
   },
   watch: {
     scrollY (newY) {
-      // let translateY = Math.max(this.minTranslateY, newY)
       const percent = Math.abs(newY / this.imageHeight)
       if (newY < (this.minTranslateY + RESERVED_HEIGHT - 20)) {
         this.headerTitle = this.musicList.name
