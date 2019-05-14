@@ -1,51 +1,68 @@
 <template>
 <transition name="slide">
   <div class="user">
+    <el-dialog  :visible.sync="dialogFormVisible" width="80%" :modal="false" :show-close="false">
+      <el-form :model="form">
+        <el-form-item label="歌单名称" >
+          <el-input  autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
     <div class="back" @click="back">
       <i class="fa fa-angle-left"></i>
     </div>
-    <div class='profile'>
-      <div class="bg-image"><img :src="profile.bgImgUrl"/></div>
-      <div class="avatar"><img :src="profile.avatarUrl"/></div>
-      <div class="edit-btn" @click="onProfileEditBtnClick">
-        <i class="fa fa-pencil" aria-hidden="true"></i>
-        <span class="text">编辑</span>
-      </div>
-      <div class="nickname">{{profile.nickname}}</div>
-      <div class="info">
-        <div class="gender" v-if="profile.gender=='0'">
-          <i style="color:#FFD1E4;" class="fa fa-venus" aria-hidden="true"></i>女</div>
-        <div class="gender" v-else>
-          <i style="color:#26A6E4;" class="fa fa-mars" aria-hidden="true"></i> 男</div>
-        <div class="follower-cnt">Follower&nbsp;&nbsp;{{profile.followerCnt}}</div>
-      </div>
-    </div>
-    <div class="switches-wrapper">
-      <switches @switch="switchItem" :switches="switches" :currentIndex="currentIndex"></switches>
-    </div>
     <div class="list-wrapper" ref="listWrapper">
-      <scroll ref="mySongSheetsList" class="list-scroll" :data="songSheets" v-if="currentIndex === 0">
-        <div class="list-inner">
-          <div class="my-songsheet" ref="songSheet">
-            <song-sheet-list :data="songSheets" @select="selectSongSheet" ref="songSheetList"></song-sheet-list>
-            <router-view></router-view>
+      <scroll ref="mySongSheetsList" class="list-scroll":data="songSheets" >
+        <div>
+          <div class='profile'>
+            <div class="bg-image"><img :src="profile.bgImgUrl"/></div>
+            <div class="avatar"><img :src="profile.avatarUrl"/></div>
+            <div class="edit-btn" @click="onProfileEditBtnClick">
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+              <span class="text">编辑</span>
+            </div>
+            <div class="nickname">{{profile.nickname}}</div>
+            <div class="info">
+              <div class="gender" v-if="profile.gender=='0'">
+                <i style="color:#FFD1E4;" class="fa fa-venus" aria-hidden="true"></i></div>
+              <div class="gender" v-else>
+                <i style="color:#26A6E4;" class="fa fa-mars" aria-hidden="true"></i></div>
+              <div class="follower-cnt">Follower&nbsp;&nbsp;{{profile.followerCnt}}</div>
+            </div>
+          </div>
+          <div class="switches-wrapper" :style="tabBarFixedTopCssStyle">
+            <switches @switch="switchItem" :switches="switches" :currentIndex="currentIndex"></switches>
+          </div>
+          <div ref="mySongSheetsList" v-if="currentIndex === 0">
+            <div class="my-songsheet" ref="songSheet">
+              <div class="songsheet-hd">
+                <div class="title">我的歌单</div>
+                <div class="add-btn" @click="createSongSheet">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                </div>
+              </div>
+              <song-sheet-list :data="songSheets" @select="selectSongSheet" ref="songSheetList"></song-sheet-list>
+              <router-view></router-view>
+            </div>
+          </div>
+          <div ref="feedList" v-if="currentIndex == 1">
+            <div class="list-inner">
+              <feed-list :data='feeds' ref="feedList" @retweet="onRetweet" @praise="onPraise" @clickview="onClickFeedView"></feed-list>
+            </div>
+            <div class="post-feed" >
+              <el-button type="danger" icon="el-icon-plus"  class="post-feed-btn" @click="onPostFeedBtnclick" circle></el-button>
+            </div>
           </div>
         </div>
       </scroll>
-      <scroll ref="feedList" class="list-scroll" v-if="currentIndex === 1">
-        <div class="list-inner">
-          <feed-list :data='feeds' ref="feedList" @retweet="onRetweet" @praise="onPraise" @clickview="onClickFeedView"></feed-list>
-        </div>
-        <div class="post-feed" >
-          <el-button type="danger" icon="el-icon-plus"  class="post-feed-btn" @click="onPostFeedBtnclick" circle></el-button>
-        </div>
-      </scroll>
-     
     </div>
     <div class="no-result-wrapper" v-show="noResult">
       <no-result :title="noResultDesc"></no-result>
     </div>
-    
   </div>
 </transition>
 </template>
@@ -66,13 +83,15 @@ export default {
   data () {
     return {
       currentIndex: 0,
+      dialogFormVisible:false,
       switches: [
         {name: '音乐'},
         {name: '动态'},
         {name: '我的'}
       ],
       songSheets:[],
-      feeds:[]
+      feeds:[],
+      tabBarFixedTopCssStyle:""
     }
   },
   computed: {
@@ -114,6 +133,9 @@ export default {
     this.getSongSheets();
   },
   methods: {
+    createSongSheet() {
+      this.dialogFormVisible = true;
+    },
     getProfile(){
       let profile =  {
         avatarUrl: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
@@ -351,106 +373,150 @@ export default {
     position: absolute;
     top: 0;
     left: 4px;
+    z-index:99999;
     .fa-angle-left {
       padding: 5px 10px;
       font-size: 30px;
       color: #fff;
     }
   }
-  .profile{
-    height: 300px;
+  .list-wrapper {
+    display:relative;
     width:100%;
-    z-index:-99999;
-    color:white;
-    padding-left:20px;
-    position:relative;
-    .bg-image{
-      position:absolute;
-      top:0;
-      left:0;
-      height:300px;
-      width:100%;
-      z-index:-1;  
-      img{
+    height:100%;
+    .list-scroll {
+      overflow:hidden;
+      height:100%;
+      .profile{
+        height: 300px;
         width:100%;
-        height:100%;
+        z-index:9999;
+        color:white;
+        padding-left:20px;
+        position:relative;
+        .bg-image{
+          position:absolute;
+          top:0;
+          left:0;
+          height:300px;
+          width:100%;
+          z-index:-1;  
+          img{
+            width:100%;
+            height:100%;
+          }
+        }
+        .avatar{
+          width: 80px;
+          height: 80px;
+          padding-top:100px;
+          margin-bottom: 10px;
+          border-radius:40px;
+          img{
+            width:80px;
+            height: 80px;
+            border-radius:40px;
+          }
+        }
+        .nickname{
+          color: white;
+          display:inline-block;
+          height:20px;
+          font-size:18px;
+          line-height:20px;
+          text-align:center;
+          font-weight:bold;
+        }
+        .edit-btn{
+          position:absolute;
+          top:120px;
+          right:50px;
+          width: 80px;
+          height: 30px;
+          color:#f1f2f3;
+          text-align:center;
+          line-height:30px;
+          font-size:14px;
+          background: rgba(248,249,250,0.5);
+          border-radius:5px;
+          .text{
+            padding-left:5px;
+          }
+        }
+        .info{
+          margin-top:10px;
+          .gender{
+            font-size: 12px;
+            height: 25px;
+            line-height:25px;
+            display:inline-block;
+            background:rgba(248,249,250,0.5);
+            padding-left:5px;
+            padding-right:5px;
+            border-radius: 5px;
+            color:#fff;
+          }
+          .follower-cnt{
+            font-size: 12px;
+            height: 25px;
+            line-height:25px;
+            display:inline-block;
+            background:rgba(248,249,250,0.5);
+            padding-left:5px;
+            padding-right:5px;
+            border-radius: 5px;
+            color:#fff;
+          }
+        }  
       }
-    }
-    .avatar{
-      width: 80px;
-      height: 80px;
-      padding-top:100px;
-      margin-bottom: 10px;
-      border-radius:40px;
-      img{
-        width:80px;
-        height: 80px;
-        border-radius:40px;
+      .switches-wrapper {
+        display: flex;
+        align-items: center;
+        background: $color-theme;
+        height: 44px;
+        position:absolute;
+        top: 256px;
+        width:100%;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        z-index:9999;
       }
-    }
-    .nickname{
-      color: white;
-      display:inline-block;
-      height:20px;
-      font-size:18px;
-      line-height:20px;
-      text-align:center;
-      font-weight:bold;
-    }
-    .edit-btn{
-      position:absolute;
-      top:120px;
-      right:50px;
-      width: 80px;
-      height: 30px;
-      color:#f1f2f3;
-      text-align:center;
-      line-height:30px;
-      font-size:14px;
-      background: rgba(248,249,250,0.5);
-      border-radius:5px;
-      .text{
-        padding-left:5px;
+      .my-songsheet{
+        width:100%;
+        background:#ccc;
+        .songsheet-hd{
+          height:30px;
+          line-height:30px;
+          color:white;
+          .title{
+            height:30px;
+            line-height:30px;
+            float:left;
+            margin-left:10px;
+            font-size:14px;
+          }
+          .add-btn{
+            float:right;
+            height:30px;
+            line-height:30px;
+            margin-right:20px;
+          }
+        }
       }
-    }
-    .info{
-      margin-top:10px;
-      .gender{
-        font-size: 12px;
-        height: 25px;
-        line-height:25px;
-        display:inline-block;
-        background:rgba(248,249,250,0.5);
-        padding-left:5px;
-        padding-right:5px;
-        border-radius: 5px;
-        color:#fff;
+      .post-feed{
+        position:fixed;
+        right: 20px;
+        bottom:20px;
+        .post-feed-btn{
+          width:54px;
+          height:54px;
+          background:$color-theme;
+          border:none;
+          font-size:30px;
+        }
       }
-      .follower-cnt{
-        font-size: 12px;
-        height: 25px;
-        line-height:25px;
-        display:inline-block;
-        background:rgba(248,249,250,0.5);
-        padding-left:5px;
-        padding-right:5px;
-        border-radius: 5px;
-        color:#fff;
-      }
-      
     }
     
-  }
-  .switches-wrapper {
-    display: flex;
-    align-items: center;
-    background: $color-theme;
-    height: 44px;
-    position:relative;
-    top: -44px;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    z-index:1000;
   }
   .sequence-play {
     position: absolute;
@@ -473,29 +539,6 @@ export default {
       font-size: $font-size-medium;
       color: $color-text-g;
     }
-  }
-  .list-wrapper {
-    position: absolute;
-    top: 300px;
-    bottom: 0;
-    width: 100%;
-    .list-scroll {
-      overflow: hidden;
-      height: 100%;
-      .post-feed{
-        position:fixed;
-        right: 20px;
-        bottom:20px;
-        .post-feed-btn{
-          width:54px;
-          height:54px;
-          background:$color-theme;
-          border:none;
-          font-size:30px;
-        }
-      }
-    }
-    
   }
   .no-result-wrapper {
     margin-top: 60%;
