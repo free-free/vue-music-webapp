@@ -13,12 +13,10 @@ export default class Song {
 }
 
 function singerName (arr) {
-  let name = []
+  let name = [];
   name = arr.map((item) => {
-    // console.log(arr)
     return item.name
   })
-
   return name.join('/')
 }
 
@@ -27,20 +25,18 @@ export function createRecommendSong (music) {
     id: music.id,
     singer: singerName(music.song.artists),
     name: music.name,
-    // aliaName: music.song.alias.join('-'),
     album: music.song.album.name,
     image: music.song.album.picUrl
-  })
+  });
 }
 
 export function createRecommendListSong (music) {
   return new Song({
     id: music.id,
-    singer: singerName(music.artists),
+    singer: singerName(music.ar),
     name: music.name,
-    // aliaName: music.song.alias.join('-'),
-    album: music.album.name,
-    image: music.album.picUrl
+    album: music.al.name,
+    image: music.al.picUrl
   })
 }
 
@@ -49,7 +45,6 @@ export function createSong (music) {
     id: music.id,
     singer: singerName(music.ar),
     name: music.name,
-    // aliaName: filiterAliaName(music.alia),
     album: music.al.name,
     image: music.al.picUrl
   })
