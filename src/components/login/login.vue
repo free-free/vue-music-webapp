@@ -29,6 +29,7 @@
 
 <script>
   import Auth from '../../api/auth';
+  import {mapMutations, mapGetters} from 'vuex';
   export default {
     data() {
       return {
@@ -62,7 +63,10 @@
       btnText() {
         if (this.isBtnLoading) return '登录中...';
         return '登录';
-      }
+      },
+      ...mapGetters({
+        'profile':'uprofile'
+      })
     },
     methods: {
       onResetPasswdBtnClick:function(){
@@ -85,6 +89,14 @@
               _this.logining = false;
               switch(res.code){
                 case 200:
+                  let profile =  {
+                    avatarUrl: res.user.avatar,
+                    bgImgUrl: res.user.back_img,
+                    nickname: res.user.username,
+                    gender: !res.user.gender ? "0": "1",
+                    followerCnt:80
+                  }
+                  _this.setProfile(profile);
                   for (var key in res.user){
                     sessionStorage.setItem(key, res.user[key]);
                   }
@@ -116,6 +128,9 @@
           }
         });
       },
+      ...mapMutations({
+        setProfile: 'SET_UPROFILE'
+      })
     }
   }
 </script>
