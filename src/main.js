@@ -17,14 +17,14 @@ Vue.use(gallery, {
 
 fastclick.attach(document.body)
 
-/*
+
 router.beforeEach(function(to, from, next){
  
   //if (to.path == '/login') {
   //  sessionStorage.clear();
   //}
 
-  var user = sessionStorage.getItem('_id');
+  var user = sessionStorage.getItem('id');
   if (!user && to.path != '/login') {
   	if (to.path != '/register'){
   		next({ path: '/login' })	
@@ -35,7 +35,7 @@ router.beforeEach(function(to, from, next){
     next()
   }
 })
-*/
+
 
 /* eslint-disable no-new */
 new Vue({
