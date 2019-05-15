@@ -2,9 +2,9 @@
 <transition name="slide">
   <div class="user">
     <el-dialog  :visible.sync="dialogFormVisible" width="80%" :modal="false" :show-close="false">
-      <el-form :model="form">
+      <el-form :model="songSheetForm">
         <el-form-item label="歌单名称" >
-          <el-input  autocomplete="off"></el-input>
+          <el-input  autocomplete="off" v-model="songSheetForm.name" ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -34,7 +34,7 @@
               <div class="follower-cnt">Follower&nbsp;&nbsp;{{profile.followerCnt}}</div>
             </div>
           </div>
-          <div class="switches-wrapper" :style="tabBarFixedTopCssStyle">
+          <div class="switches-wrapper" >
             <switches @switch="switchItem" :switches="switches" :currentIndex="currentIndex"></switches>
           </div>
           <div ref="mySongSheetsList" v-if="currentIndex === 0">
@@ -76,6 +76,8 @@ import FeedList from 'base/feed-list/feed-list'
 import SongSheetList from 'base/songsheet-list/songsheet-list'
 import {getSingers} from 'src/api/singer'
 import {mapMutations} from 'vuex'
+
+
 const pinyin = require('pinyin');
 const HOT_NAME = '热门';
 const HOT_SINGERS = 10;
@@ -91,7 +93,9 @@ export default {
       ],
       songSheets:[],
       feeds:[],
-      tabBarFixedTopCssStyle:""
+      songSheetForm:{
+        name:""
+      }
     }
   },
   computed: {
