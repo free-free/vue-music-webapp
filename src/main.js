@@ -19,13 +19,16 @@ fastclick.attach(document.body)
 
 
 router.beforeEach(function(to, from, next){
- 
   //if (to.path == '/login') {
   //  sessionStorage.clear();
   //}
-
   var user = sessionStorage.getItem('id');
-  if (!user && to.path != '/login') {
+  var tmpAccess = sessionStorage.getItem('tmpAccess');
+  if(to.meta.requireAuth && !user){
+    next({ path: '/login' });
+    return ;
+  }
+  if (!user && !tmpAccess && to.path != '/login') {
   	if (to.path != '/register'){
   		next({ path: '/login' })	
   	}else{
@@ -35,6 +38,7 @@ router.beforeEach(function(to, from, next){
     next()
   }
 })
+
 
 
 /* eslint-disable no-new */

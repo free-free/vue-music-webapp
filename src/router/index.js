@@ -1,13 +1,5 @@
-/*import Vue from 'vue'*/
 import Router from 'vue-router'
-// import Singer from 'cpnts/singer/singer'
-// import Recommend from 'cpnts/recommend/recommend'
-// import Rank from 'cpnts/rank/rank'
-// import Search from 'cpnts/search/search'
-// import MusicList from 'cpnts/music-list/music-list'
-// import SingerDetail from 'cpnts/singer-detail/singer-detail'
-// import RankDetail from 'cpnts/rank-detail/rank-detail'
-// import User from 'cpnts/user/user'
+
 
 Vue.use(Router)
 
@@ -96,17 +88,17 @@ const ProfileEdit = (resolve) => {
 
 export default new Router({
   routes: [
-    /*
     {
       path: '/',
       redirect: '/login'
     },
-   */
+    /*
     {
       // 默认跳转到 recommend
       path: '/',
       redirect: '/recommend'
     },
+    */
     {
       path: '/recommend',
       component: Recommend,
@@ -158,26 +150,39 @@ export default new Router({
     {
       path: '/user',
       component: User,
+      meta:{
+        requireAuth:true
+      }
     },
     {
       path: '/user/profile',
-      component: ProfileEdit
+      component: ProfileEdit,
+      meta:{
+        requireAuth:true
+      }
     },
     {
       path:'/login',
-      component: Login
+      component: Login,
     },
     {
       path:'/register',
-      component: Register
+      component: Register,
     },
     {
       path:'/feed',
-      component: FeedDetail
+      component: FeedDetail,
+      meta:{
+        requireAuth:true
+      }
+  
     },
     {
       path: '/feed/post',
-      component: FeedPost
+      component: FeedPost,
+      meta:{
+        requireAuth:true
+      }
     }
   ]
 })

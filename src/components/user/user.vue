@@ -39,9 +39,17 @@
           </div>
           <div ref="mySongSheetsList" v-if="currentIndex === 0">
             <div class="my-songsheet" ref="songSheet">
+              <div class="play-history" @click="selectPlayHistory">
+                <i class="fa fa-music" aria-hidden="true"></i>
+                <div class="text-name">最近播放</div>
+              </div>
+              <div class="favorite-list" @click="selectFavorite">
+                <i class="fa fa-heart" aria-hidden="true"></i>
+                <div class="text-name">喜欢的音乐</div>
+              </div>
               <div class="songsheet-hd">
                 <div class="title">我的歌单</div>
-                <div class="add-btn" @click="createSongSheet">
+                <div class="add-btn" @click="showSongSheetCreationPopup">
                   <i class="fa fa-plus" aria-hidden="true"></i>
                 </div>
               </div>
@@ -53,9 +61,6 @@
             <div class="list-inner">
               <feed-list :data='feeds' ref="feedList" @retweet="onRetweet" @praise="onPraise" @clickview="onClickFeedView"></feed-list>
             </div>
-            <div class="post-feed" >
-              <el-button type="danger" icon="el-icon-plus"  class="post-feed-btn" @click="onPostFeedBtnclick" circle></el-button>
-            </div>
           </div>
         </div>
       </scroll>
@@ -63,24 +68,24 @@
     <div class="no-result-wrapper" v-show="noResult">
       <no-result :title="noResultDesc"></no-result>
     </div>
+    <div class="post-feed" v-if="currentIndex == 1" >
+      <el-button type="danger" icon="el-icon-plus"  class="post-feed-btn" @click="onPostFeedBtnclick" circle></el-button>
+    </div>
   </div>
 </transition>
 </template>
 
 <script>
 import Switches from 'base/switches/switches'
-import {mapGetters, mapActions} from 'vuex'
+import {mapGetters, mapActions,mapMutations} from 'vuex'
 import NoResult from 'base/no-result/no-result'
 import Scroll from 'base/scroll/scroll'
 import FeedList from 'base/feed-list/feed-list'
 import SongSheetList from 'base/songsheet-list/songsheet-list'
-import {getSingers} from 'src/api/singer'
-import {mapMutations} from 'vuex'
-
+import {getUserSongSheets} from 'src/api/songsheet'
+import {getSongSheetDetail} from 'src/api/songsheet'
 
 const pinyin = require('pinyin');
-const HOT_NAME = '热门';
-const HOT_SINGERS = 10;
 export default {
   data () {
     return {
@@ -88,11 +93,9 @@ export default {
       dialogFormVisible:false,
       switches: [
         {name: '音乐'},
-        {name: '动态'},
-        {name: '我的'}
+        {name: '动态'}
       ],
       songSheets:[],
-      feeds:[],
       songSheetForm:{
         name:""
       }
@@ -122,55 +125,79 @@ export default {
         return '你还没有听过歌呀~'
       }
     },
+    feeds(){
+      return this.formalizeFeeds(this.$store.state.feeds);
+    },
     ...mapGetters({
       'favoriteList':'favoriteList',
       'playHistory':'playHistory',
       'singer':'singer',
-      'profile':'uprofile'
+      'profile':'uprofile',
     })
   },
   created(){
+    /*
     if(!('nickname' in this.profile)){
-      let profile = this.getProfile();
-      this.setProfile(profile);
+      this.$router.push({
+        path: '/login'
+      });
+      return ;
     }
+    */
     this.getSongSheets();
   },
   methods: {
-    createSongSheet() {
-      this.dialogFormVisible = true;
-    },
-    getProfile(){
-      let profile =  {
-        avatarUrl: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
-        bgImgUrl: "http://img1.imgtn.bdimg.com/it/u=3221312703,524229742&fm=26&gp=0.jpg",
-        nickname: "infinite.ft",
-        gender: "0",
-        followerCnt:80
+    selectFavorite(){
+      let songSheet = {
+        id: 0,
+        name: "喜欢的音乐",
+        bgImgUrl: 'http://img1.imgtn.bdimg.com/it/u=3221312703,524229742&fm=26&gp=0.jpg',
+        updateTime: new Date(),
+        tracks: this.favoriteList
       }
-      return profile
+      this.setSongSheet(songSheet);
+      this.$router.push({
+        path: `/songsheet/0`
+      });
+    },
+    selectPlayHistory(){
+      let songSheet = {
+        id: 0,
+        name: "最近播放",
+        bgImgUrl: 'http://img1.imgtn.bdimg.com/it/u=3221312703,524229742&fm=26&gp=0.jpg',
+        updateTime: new Date(),
+        tracks: this.playHistory
+      }
+      this.setSongSheet(songSheet);
+      this.$router.push({
+        path: `/songsheet/1`
+      });
+    },
+    showSongSheetCreationPopup() {
+      this.dialogFormVisible = true;
     },
     back () {
       this.$router.back()
     },
     switchItem (index) {
       this.currentIndex = index;
-      this.feeds = this.formalizeFeeds(this.getFeeds());
+      //this.feeds = this.formalizeFeeds(this.getFeeds());
     },
-    selectSongSheet(songSheet){
-      this.$router.push({
-        path: `/songsheet/${songSheet.id}`
-      });
-      this.setSinger(songSheet);
-      this.setSongSheet({
-        id: songSheet.id,
-        name: songSheet.name,
-        bgImgUrl: 'http://img1.imgtn.bdimg.com/it/u=3221312703,524229742&fm=26&gp=0.jpg',
-        updateTime: new Date(),
-      });
-    },
-    selectSong (song) {
-      this.insertSong(song)
+    selectSongSheet(sid){
+      getSongSheetDetail(sid).then(res=>{
+        let playlist = res.data.playlist;
+        let songSheet = {
+          id: sid,
+          name: playlist.name,
+          bgImgUrl: playlist.coverImgUrl,
+          updateTime: new Date(playlist.updateTime),
+          tracks: playlist.tracks
+        }
+        this.setSongSheet(songSheet);
+        this.$router.push({
+          path: `/songsheet/${sid}`
+        });
+      })
     },
     sequence () {
       let list = this.currentIndex === 0 ? this.favoriteList : this.playHistory
@@ -182,51 +209,17 @@ export default {
       })
     },
     getSongSheets () {
-      getSingers().then((res) => {
-        let s = res.data.artists
-        s.map((item) => {
-          let py = pinyin(item.name[0], {
-            style: pinyin.STYLE_FIRST_LETTER
-          })
-          item.initial = py[0][0].toUpperCase()
-        })
-        this.songSheets = this.normalizeSinger(s)
+      getUserSongSheets('32953014').then((res) => {
+        let s = res.data.playlist
+        this.songSheets = [{
+          id:1,
+          title:"我的歌单",
+          items: res.data.playlist
+        }]
       })
     },
     getFeeds(){
-      let data = [{
-        id:12,
-        create_time: new Date(),
-        user:{
-          avatar_url: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
-          username: "有糖吃可好"
-        },
-        img_urls:[
-          "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1555316588&di=3bae5172f6a84fd898baf5072c2c07ba&imgtype=jpg&er=1&src=http%3A%2F%2Fimg.ledinside.cn%2Fled%2F2014%2F12%2F18%2F653100001418886130.jpg",
-          "http://img1.imgtn.bdimg.com/it/u=3221312703,524229742&fm=26&gp=0.jpg",
-        ],
-        desc:"在隆冬和盛夏之间，在冷酷和热烈之间，在一片渺茫和尘埃落定之间，有很多东西痒痒地生发出来，比如希望，比如理想，比如爱。如果你想到了些什么，不如现在就去试试。反正，春天很短的。",
-        praise: 0,
-        comments: [],
-        retweet: 0,
-      },
-      {
-        id:13,
-        create_time: new Date(),
-        user:{
-          avatar_url: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
-          username: "有糖吃可好"
-        },
-        img_urls:[
-          "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1555316588&di=3bae5172f6a84fd898baf5072c2c07ba&imgtype=jpg&er=1&src=http%3A%2F%2Fimg.ledinside.cn%2Fled%2F2014%2F12%2F18%2F653100001418886130.jpg",
-          "http://img1.imgtn.bdimg.com/it/u=3221312703,524229742&fm=26&gp=0.jpg",
-        ],
-        desc:"在隆冬和盛夏之间，在冷酷和热烈之间，在一片渺茫和尘埃落定之间，有很多东西痒痒地生发出来，比如希望，比如理想，比如爱。如果你想到了些什么，不如现在就去试试。反正，春天很短的。",
-        praise: 10,
-        comments: [],
-        retweet: 10,
-      }];
-      return data;
+    
     },
     formalizeFeeds(data){
       let ret = []
@@ -251,52 +244,6 @@ export default {
       })
       return ret;
     },
-    normalizeSinger (list) {
-      let map = {
-        hot: {
-          title: HOT_NAME,
-          items: []
-        }
-      }
-      list.forEach((item, index) => {
-        if (index < HOT_SINGERS) {
-          map.hot.items.push({
-            id: item.id,
-            name: item.name,
-            avatar: item.img1v1Url,
-            aliaName: item.alias.join(' / ')
-          })
-        }
-
-        const key = item.initial
-        if (!map[key]) {
-          map[key] = {
-            title: key,
-            items: []
-          }
-        }
-        map[key].items.push({
-          id: item.id,
-          name: item.name,
-          avatar: item.img1v1Url,
-          aliaName: item.alias[0]
-        })
-      })
-      let hot = []
-      let ret = []
-      for (const key in map) {
-        let val = map[key]
-        if (val.title.match(/[A-Z]/)) {
-          ret.push(val)
-        } else if (val.title === HOT_NAME) {
-          hot.push(val)
-        }
-      }
-      ret.sort((a, b) => {
-        return a.title.charCodeAt(0) - b.title.charCodeAt(0)
-      })
-      return hot.concat(ret)
-    },
     onRetweet(index, feed){
       let new_feed = {}
       new_feed['id'] = Math.floor(Math.random() * 10000);
@@ -305,19 +252,22 @@ export default {
       new_feed['comments'] = []
       new_feed['create_time'] = new Date();
       new_feed['user'] = {}
-      new_feed['user']['username'] = 'fhauisda';
-      new_feed['user']['avatar_url'] =   "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg";
+      new_feed['user']['username'] = this.profile.nickname;
+      new_feed['user']['avatar_url'] = this.profile.avatarUrl;
       new_feed['img_urls'] = feed['img_urls'];
       new_feed['desc'] = feed['desc']; 
       feed.retweet += 1;
       this.feeds[index] = this.formalizeFeeds([feed])[0]; 
       this.feeds.push(this.formalizeFeeds([new_feed])[0]);
+      this.setFeed(this.feeds);
     },
     onPraise(index, feed){
       feed.praise += 1;
       this.feeds[index] = this.formalizeFeeds([feed])[0];
+      this.setFeed(this.feeds);
     },
     onClickFeedView(index, feed){
+      this.setCurrentFeed(index);
       this.$router.push({
         path:'/feed',
         query:{
@@ -343,7 +293,9 @@ export default {
     ...mapMutations({
       setSinger: 'SET_SINGER',
       setSongSheet: 'SET_SONG_SHEET',
-      setProfile: 'SET_UPROFILE'
+      setFeed:'SET_FEED',
+      setProfile: 'SET_UPROFILE',
+      setCurrentFeed: 'SET_CURRENT_FEED_IDX'
     })
   },
   components: {
@@ -487,7 +439,21 @@ export default {
       }
       .my-songsheet{
         width:100%;
-        background:#ccc;
+        background:#cfcfcf;
+        .play-history, .favorite-list{
+          padding:15px 20px;;
+          font-size:20px;
+          width: 100%;
+          color:#aaa;
+          background: $color-background;
+          border-bottom: 1px solid #ddd;
+          .text-name{
+            font-size:14px;
+            padding-left: 26px;
+            display:inline-block;
+            color:#333;
+          }
+        }
         .songsheet-hd{
           height:30px;
           line-height:30px;
@@ -507,20 +473,22 @@ export default {
           }
         }
       }
-      .post-feed{
-        position:fixed;
-        right: 20px;
-        bottom:20px;
-        .post-feed-btn{
-          width:54px;
-          height:54px;
-          background:$color-theme;
-          border:none;
-          font-size:30px;
-        }
-      }
+      
     }
     
+  }
+  .post-feed{
+    position:fixed;
+    right: 20px;
+    bottom:70px;
+    z-index:999999999;
+    .post-feed-btn{
+      width:54px;
+      height:54px;
+      background:$color-theme;
+      border:none;
+      font-size:30px;
+    }
   }
   .sequence-play {
     position: absolute;
@@ -547,7 +515,6 @@ export default {
   .no-result-wrapper {
     margin-top: 60%;
   }
- 
 }
 </style>
 

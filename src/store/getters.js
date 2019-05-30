@@ -41,3 +41,8 @@ export const currentSongUrl = (state) => {
     return res.data.data.url || ''
   })
 }
+
+export const feeds = state => state.feeds
+
+
+export const currentFeedIdx = state => state.currentFeedIdx

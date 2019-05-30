@@ -30,3 +30,9 @@ export const SET_UPROFILE = 'SET_UPROFILE'
 
 export const UPDATE_UPROFILE = 'UPDATE_UPROFILE'
 
+export const SET_FEED = 'SET_FEED'
+
+export const INSERT_FEED = 'INSERT_FEED'
+
+export const SET_CURRENT_FEED_IDX = 'SET_CURRENT_FEED_IDX'
+

@@ -51,11 +51,7 @@
           </ul>
         </div>
       </div>
-      <!--
-      <div v-show="!listDetail.length" class="loading-content">
-        <loading></loading>
-      </div>
-    -->
+      
     </scroll>
     <div class="comment-poster-wrapper">
       <div class='comment-textarea'>
@@ -78,17 +74,14 @@
 import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
 import SongList from 'base/song-list/song-list'
-import {mapGetters, mapActions} from 'vuex'
 import {createSong} from 'common/js/song'
-
+import {mapGetters, mapActions,mapMutations} from 'vuex'
 const RESERVED_HEIGHT = 44
 
 export default {
   
   data () {
     return {
-      feed: {},
-      comments:{},
       scrollY: 0,
       node: null,
       headerTitle: '',
@@ -98,8 +91,6 @@ export default {
     }
   },
   created () {
-    this.feed = this.formalizeFeed(this.getFeedDetail());
-    this.comments = this.formalizeComments(this.getComments());
     this.probeType = 3
     this.listenScroll = true
   },
@@ -114,6 +105,17 @@ export default {
     title () {
       return this.headerTitleTouchDown
     },
+    feed(){
+      return this.formalizeFeed(this.$store.state.feeds[this.$store.state.currentFeedIdx]);
+    },
+    comments(){
+      return this.formalizeComments(this.$store.state.feeds[this.$store.state.currentFeedIdx].comments);
+    },
+    ...mapGetters({
+      'feeds':'feeds',
+      'profile':'uprofile',
+      'currentFeedIdx':'currentFeedIdx'
+    })
   },
   methods: {
     formalizeFeed(feed){
@@ -144,74 +146,6 @@ export default {
       });
       return ret;
     },
-    getFeedDetail(feedId, uid){
-      return {
-        id:12,
-        create_time: new Date(),
-        user:{
-          avatar_url: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
-          username: "有糖吃可好"
-        },
-        img_urls:[
-          "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1555316588&di=3bae5172f6a84fd898baf5072c2c07ba&imgtype=jpg&er=1&src=http%3A%2F%2Fimg.ledinside.cn%2Fled%2F2014%2F12%2F18%2F653100001418886130.jpg",
-          "http://img1.imgtn.bdimg.com/it/u=3221312703,524229742&fm=26&gp=0.jpg",
-          "http://img1.imgtn.bdimg.com/it/u=3221312703,524229742&fm=26&gp=0.jpg"
-        ],
-        desc:"在隆冬和盛夏之间，在冷酷和热烈之间，在一片渺茫和尘埃落定之间，有很多东西痒痒地生发出来，比如希望，比如理想，比如爱。如果你想到了些什么，不如现在就去试试。反正，春天很短的。",
-        praise: 0,
-        comments: [],
-        retweet: 0,
-      };
-    },
-    getComments(feed_id){
-      return [
-        {
-          id:12,
-          create_time: new Date(),
-          user:{
-            avatar_url: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
-            username: "有糖吃可好"
-          },
-          text:"在隆冬和盛夏之间，在冷酷和热烈之间，在一片渺茫和尘埃落定之间，有很多东西痒痒地生发出来，比如希望，比如理想，比如爱。如果你想到了些什么，不如现在就去试试。反正，春天很短的。",
-        },
-         {
-          id:2,
-          create_time: new Date(),
-          user:{
-            avatar_url: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
-            username: "有糖吃可好"
-          },
-          text:"在隆冬和盛夏之间，在冷酷和热烈之间，在一片渺茫和尘埃落定之间，有很多东西痒痒地生发出来，比如希望，比如理想，比如爱。如果你想到了些什么，不如现在就去试试。反正，春天很短的。",
-        },
-        {
-          id:32,
-          create_time: new Date(),
-          user:{
-            avatar_url: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
-            username: "有糖吃可好"
-          },
-          text:"在隆冬和盛夏之间，在冷酷和热烈之间，在一片渺茫和尘埃落定之间，有很多东西痒痒地生发出来，比如希望，比如理想，比如爱。如果你想到了些什么，不如现在就去试试。反正，春天很短的。",
-        },
-        {
-          id:40,
-          create_time: new Date(),
-          user:{
-            avatar_url: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
-            username: "有糖吃可好"
-          },
-          text:"在隆冬和盛夏之间，在冷酷和热烈之间，在一片渺茫和尘埃落定之间，有很多东西痒痒地生发出来，比如希望，比如理想，比如爱。如果你想到了些什么，不如现在就去试试。反正，春天很短的。",
-        },
-        {
-          id:8,
-          create_time: new Date(),
-          user:{
-            avatar_url: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554609161648&di=97d035fae1fb2bf304e1ec24ab08a2fe&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F15%2F20180915084441_kmsfk.thumb.224_0.jpg",
-            username: "有糖吃可好"
-          },
-          text:"在隆冬和盛夏之间，在冷酷和热烈之间，在一片渺茫和尘埃落定之间，有很多东西痒痒地生发出来，比如希望，比如理想，比如爱。如果你想到了些什么，不如现在就去试试。反正，春天很短的。",
-        },
-      ]
-    },
     scroll (pos) {
       this.scrollY = pos.y
     },
@@ -221,14 +155,19 @@ export default {
     onPostCommentBtnClick(){
       let data = {};
       data['text'] = this.postComment.text;
-      data['id'] = 32;
+      data['id'] = new Date().getTime();
       data['create_time'] = new Date();
       data['user'] = {}
-      data['user']['avatar_url'] = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1555316588&di=3bae5172f6a84fd898baf5072c2c07ba&imgtype=jpg&er=1&src=http%3A%2F%2Fimg.ledinside.cn%2Fled%2F2014%2F12%2F18%2F653100001418886130.jpg";
-      data['user']['username'] = 'infinite.ft'
-      this.comments.unshift(this.formalizeComments([data])[0]);
+      data['user']['avatar_url'] = this.profile.avatarUrl;
+      data['user']['username'] = this.profile.nickname
+      this.feeds[this.currentFeedIdx].comments.unshift(this.formalizeComments([data])[0]);
+      this.setFeed(this.feeds);
       this.postComment.text = '';
-    }
+    },
+    ...mapMutations({
+      setFeed:'SET_FEED',
+      setCurrentFeed: 'SET_CURRENT_FEED_IDX'
+    })
   },
   watch: {
     scrollY (newY) {

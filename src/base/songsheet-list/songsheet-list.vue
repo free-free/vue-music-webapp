@@ -6,11 +6,11 @@
       <li v-for="group in data" class="list-group" :key="group.id" ref="listGroup">
         <h2 class="list-group-title">{{ group.title }}</h2>
         <ul>
-          <li @click="selectItem(item)" v-for="item in group.items" class="list-group-item" :key="item.id">
-            <img v-lazy="item.avatar" class="avatar">
+          <li @click="selectItem(item.id)" v-for="item in group.items" class="list-group-item" :key="item.id">
+            <img v-lazy="item.coverImgUrl" class="avatar">
             <div class="songsheet-info">
               <span class="name">{{ item.name }}</span>
-              <span class="song-cnt">{{group.items.length}}首歌</span>
+              <span class="song-cnt">{{item.trackCount}}首歌</span>
             </div>
           </li>
         </ul>

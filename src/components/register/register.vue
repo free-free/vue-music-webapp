@@ -30,6 +30,7 @@
 
 <script>
   import Auth from '../../api/auth';
+  import {mapMutations, mapGetters} from 'vuex';
   export default {
     data() {
       return {
@@ -95,7 +96,15 @@
                   for (var key in res.user){
                     sessionStorage.setItem(key, res.user[key]);
                   }
-                  _this.$router.push({ path: '/' });
+                  let profile =  {
+                    avatarUrl: res.user.avatar,
+                    bgImgUrl: res.user.back_img,
+                    nickname: res.user.username,
+                    gender: !res.user.gender ? "0": "1",
+                    followerCnt:80
+                  }
+                  _this.setProfile(profile);
+                  _this.$router.push({ path: '/recommend' });
                 break;
                 case 3007:
                   _this.$message({
@@ -138,6 +147,9 @@
           }
         });
       },
+      ...mapMutations({
+        setProfile: 'SET_UPROFILE'
+      })
     }
   }
 </script>

@@ -31,6 +31,8 @@ export default {
     getDesc (song) {
       if (song.aliaName) {
         return `${song.singer} - ${song.aliaName}`
+      }else if(song.ar && song.ar.length > 0){
+        return `${song.ar[0].name}`
       } else {
         return `${song.singer}`
       }

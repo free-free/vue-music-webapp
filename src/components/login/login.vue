@@ -16,7 +16,7 @@
               <el-button type="primary" style="width:100%;background-color:#d44439;outline-color: #d44439;border-color: #d44439;" @click.native.prevent="onLoginBtnClick" :loading="logining">登录</el-button>
             </el-form-item>
             <div style="margin:10px auto;width:70%">
-              <span style="color: white;" @click="onResetPasswdBtnClick">忘记密码?</span>
+              <span style="color: white;" @click="onLaterLoginBtnClick">稍后登录</span>
               <span style="float: right;color: white;" @click="onRegisterBtnClick">注册>></span>
             </div>
           </el-form>
@@ -69,8 +69,9 @@
       })
     },
     methods: {
-      onResetPasswdBtnClick:function(){
-        console.log('reset password');
+      onLaterLoginBtnClick:function(){
+        sessionStorage.setItem('tmpAccess', true);
+        this.$router.push({"path": "/recommend"});
       },
       onRegisterBtnClick:function(){
         this.$router.push({"path":'/register'});
@@ -89,6 +90,7 @@
               _this.logining = false;
               switch(res.code){
                 case 200:
+                  console.log(res);
                   let profile =  {
                     avatarUrl: res.user.avatar,
                     bgImgUrl: res.user.back_img,
@@ -100,9 +102,9 @@
                   for (var key in res.user){
                     sessionStorage.setItem(key, res.user[key]);
                   }
-                  _this.$router.push({ path: '/' });
+                  _this.$router.push({ path: '/recommend' });
                   break;
-                case 40002:
+                case 3005:
                   _this.$message({
                     message: "用户名或密码不正确!",
                     type: 'error'

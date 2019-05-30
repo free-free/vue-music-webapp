@@ -25,15 +25,15 @@
           </div>
         </div>
         <div class="song-list-wrapper">
-          <div class="sequence-play" v-show="songs.length" @click="playSongList">
+          <div class="sequence-play" v-show="songSheet.tracks.length" @click="playSongList">
             <i class="iconfont icon-bofangicon"></i>
             <span class="text">播放全部</span>
             <span class="count">(共{{songs.length}}首)</span>
           </div>
-          <song-list @select="selectSong" :songs="songs"></song-list>
+          <song-list @select="selectSong" :songs="songSheet.tracks"></song-list>
         </div>
       </div>
-      <div v-show="!songs.length" class="loading-content">
+      <div v-show="!songSheet.tracks.length" class="loading-content">
         <loading></loading>
       </div>
     </scroll>
@@ -58,10 +58,13 @@ export default {
       songs: [],
       scrollY: 0,
       node: null,
-      headerTitle: ''
+      headerTitle: '',
+      probeType: 3, 
+      listenScroll: true
     }
   },
   created () {
+    //
     this.getSongSheetDetail();
     this.probeType = 3;
     this.listenScroll = true;
@@ -97,18 +100,18 @@ export default {
       this.$refs.list.refresh()
     },
     getSongSheetDetail(){
-      //this.normalizeSongs(this.songSheet.tracks)
+      this.songs = this.songSheet.tracks;
     },
     normalizeSongs (list) {
-      let ret = []
+      let ret = [];
       list.forEach((item) => {
         ret.push(createSong(item))
       })
-      this.songs = ret
+      return ret;
     },
     selectSong (item, index) {
       this.selectPlay({
-        list: this.songs,
+        list: this.songSheet.tracks,
         index: index
       })
     },
@@ -119,7 +122,7 @@ export default {
       this.$router.back()
     },
     playSongList () {
-      let list = this.songs
+      let list = this.songSheet.tracks
       this.sequencePlay({
         list: list
       })

@@ -22,6 +22,9 @@
 
 <script>
 import ImageUploader from 'base/image-uploader/image-uploader'
+
+import {mapGetters, mapActions,mapMutations} from 'vuex'
+
 export default {
   name: "FeedPost",
   data() {
@@ -38,7 +41,10 @@ export default {
   computed:{
     headerTitle(){
       return '发表动态';
-    }
+    },
+    ...mapGetters({
+      'profile':'uprofile',
+    })
   },
   methods: {
     back () {
@@ -47,7 +53,8 @@ export default {
     getImageList(files) {
       this.$nextTick(() => {
         for (let i = 0, len = files.length; i < len; i++) {
-          this.imgList.push(files[i].src.split("base64,")[1]);
+          this.imgList.push(files[i].src);
+          //this.imgList.push(files[i].src.split("base64,")[1]);
           //上传图片
           //   this._getFileCode({
           //     Base64Str: files[i].src.split("base64,")[1],
@@ -62,18 +69,18 @@ export default {
     },
     //上传图片获取fileCode (目前该方法没调用，供参考)
     _getFileCode(obj) {
-      // Indicator.open(this.lang.dynamic_publishing);
+      
       this.$http
         .post(this.$profileApi.Shared_UploadImage, obj)
         .then(data => {
           if (data.Rstatus) {
             this.FilecodeList.push(data.Rdata);
           } else {
-            // Toast(this.lang.dynamic_upload_fail);
+          
           }
         })
         .catch(err => {
-          //   Toast(this.lang.dynamic.dynamic_net_error);
+          
         });
     },
     //创建动态 (发布动态的请求)
@@ -87,20 +94,33 @@ export default {
         .then(data => {
           this.isSubmit = false;
           if (data.Rstatus) {
-            // Toast(this.lang.dynamic_publish_ok);
+            
             this.$router.back();
           } else {
-            // Toast(this.lang.dynamic_publish_fail);
+            
           }
         })
         .catch(err => {
-          //   Toast(this.lang.dynamic_net_error);
+          
         });
     },
     //发布事件
     onSendPostBtnClick() {
-      console.log("内容" + this.feed.text);
-      console.log(this.imgList);
+      let feed = {
+        id: Math.ceil(Math.random() * 100000000000) ,
+        create_time: new Date(),
+        user:{
+          avatar_url: this.profile.avatarUrl,
+          username: this.profile.nickname
+        },
+        img_urls:Array.from(this.imgList),
+        desc:this.feed.text,
+        praise: 0,
+        comments: [],
+        retweet: 0,
+      };
+      this.insertFeed(feed);
+      this.$router.push({'path':'/user'});
       //   if (this.dynamicContent.trim() == "" && this.imgList.length === 0) {
       //     // Toast(this.lang.dynamic_content_no_null);
       //     return;
@@ -121,7 +141,10 @@ export default {
       //       self.createDynamic(self.FilecodeList);
       //     }
       //   }, 200);
-    }
+    },
+    ...mapMutations({
+      insertFeed: 'INSERT_FEED'
+    })
   },
   components: {
     ImageUploader

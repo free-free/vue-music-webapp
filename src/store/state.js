@@ -1,5 +1,5 @@
 import {playMode} from 'common/js/config'
-import {loadSearch, loadPlay, loadFavorite} from 'common/js/cache'
+import {loadSearch, loadDefaultFeeds, loadPlay, loadFavorite} from 'common/js/cache'
 
 const state = {
   musicList: {},
@@ -19,6 +19,8 @@ const state = {
   topList: {},
   songSheet: {},
   uprofile:{},
+  currentFeedIdx:0,
+  feeds:loadDefaultFeeds(),
   searchHistory: loadSearch(),
   playHistory: loadPlay(),
   favoriteList: loadFavorite()

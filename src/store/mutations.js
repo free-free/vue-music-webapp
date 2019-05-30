@@ -51,6 +51,15 @@ const mutations = {
   },
   [types.SET_UPROFILE] (state, profile){
     state.uprofile = profile;
+  },
+  [types.SET_FEED](state, feeds){
+    state.feeds = feeds    
+  },
+  [types.INSERT_FEED](state, feed){
+    state.feeds.unshift(feed)
+  },
+  [types.SET_CURRENT_FEED_IDX](state, idx){
+    state.currentFeedIdx = idx;
   }
 }
 
